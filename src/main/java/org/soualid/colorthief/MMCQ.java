@@ -1,15 +1,12 @@
 package org.soualid.colorthief;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 public class MMCQ {
 
@@ -18,19 +15,16 @@ public class MMCQ {
 	private static final int MAX_ITERATIONS = 1000;
 	private static final double FRACT_BY_POPULATION = 0.75;
 	
-	public static void main(String[] args) throws IOException {
-		MMCQ m = new MMCQ();
-		BufferedImage img = ImageIO.read(new File("/Users/soualid/Downloads/test-photo/photo3.jpg"));
-		List<int[]> pixels = getPixels(img);
-		CMap cmap = m.quantize(pixels, 10);
-		List<int[]> result = cmap.palette();
-		
-		for (int i=result.size()-1; i>=0; i--) {
-			int[] is = result.get(i);
-			System.out.println("rgb: " + is[0] + ", " + is[1] + ", " + is[2]);
-		}
+	public static List<int[]> compute(BufferedImage image, int maxcolors) throws IOException {
+		List<int[]> pixels = getPixels(image);
+		return compute(pixels, maxcolors);
 	}
-
+	
+	public static List<int[]> compute(List<int[]> pixels, int maxcolors) {
+		CMap map = quantize(pixels, maxcolors);
+		return map.palette();
+	}
+	
 	private static List<int[]> getPixels(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -54,11 +48,11 @@ public class MMCQ {
 		return res;
 	}
 
-	private int getColorIndex(int r, int g, int b) {
+	private static int getColorIndex(int r, int g, int b) {
 		return (r << (2 * SIGBITS)) + (g << SIGBITS) + b;
 	}
 
-	class VBox {
+	static class VBox {
 		private int r1;
 		private int r2;
 		private int g1;
@@ -205,7 +199,7 @@ public class MMCQ {
 		}
 	}
 
-	class DenormalizedVBox {
+	static class DenormalizedVBox {
 		private VBox vbox;
 		private int[] color;
 
@@ -231,7 +225,7 @@ public class MMCQ {
 		}
 	}
 
-	class CMap {
+	static class CMap {
 		private ArrayList<DenormalizedVBox> vboxes = new ArrayList<DenormalizedVBox>();
 
 		public void push(VBox box) {
@@ -245,6 +239,7 @@ public class MMCQ {
 				DenormalizedVBox denormalizedVBox = (DenormalizedVBox) it.next();
 				r.add(denormalizedVBox.getColor());
 			}
+			Collections.reverse(r);
 			return r;
 		}
 
@@ -278,7 +273,7 @@ public class MMCQ {
 		}
 	}
 
-	private List<Integer> getHisto(List<int[]> pixels) {
+	private static List<Integer> getHisto(List<int[]> pixels) {
 		int histosize = 1 << (3 * SIGBITS);
 		List<Integer> histo = new ArrayList<Integer>(histosize);
 		for (int i = 0; i < histosize; i++) {
@@ -298,7 +293,7 @@ public class MMCQ {
 		return histo;
 	}
 
-	private VBox vboxFromPixels(List<int[]> pixels, List<Integer> histo) {
+	private static VBox vboxFromPixels(List<int[]> pixels, List<Integer> histo) {
 		int rmin = 1000000, rmax = 0, gmin = 1000000, gmax = 0, bmin = 1000000, bmax = 0, rval, gval, bval;
 		Iterator<int[]> it = pixels.iterator();
 		while (it.hasNext()) {
@@ -323,7 +318,7 @@ public class MMCQ {
 		return vbox;
 	}
 
-	private VBox[] medianCutApply(List<Integer> histo, VBox vbox) {
+	private static VBox[] medianCutApply(List<Integer> histo, VBox vbox) {
 		if (vbox.count(false) == 0)
 			return null;
 		if (vbox.count(false) == 1) {
@@ -402,7 +397,7 @@ public class MMCQ {
 		return maxw == rw ? doCut("r", vbox, partialsum, lookaheadsum, total) : maxw == gw ? doCut("g", vbox, partialsum, lookaheadsum, total) : doCut("b", vbox, partialsum, lookaheadsum, total);
 	}
 
-	private VBox[] doCut(String color, VBox vbox, List<Integer> partialsum, List<Integer> lookaheadsum, int total) {
+	private static VBox[] doCut(String color, VBox vbox, List<Integer> partialsum, List<Integer> lookaheadsum, int total) {
 		int dim1 = 0, dim2 = 0;
 		if ("r".equals(color)) {
 			dim1 = vbox.getR1();
@@ -450,7 +445,7 @@ public class MMCQ {
 	}
 
 	@SuppressWarnings("unchecked")
-	private CMap quantize(List<int[]> pixels, int maxcolors) {
+	private static CMap quantize(List<int[]> pixels, int maxcolors) {
 		if (pixels.size() == 0 || maxcolors < 2 || maxcolors > 256) {
 			return null;
 		}
@@ -482,7 +477,7 @@ public class MMCQ {
 		return cmap;
 	}
 
-	private Object[] iter(List<VBox> lh, double target, List<Integer> histo, int nColors, int niters) {
+	private static Object[] iter(List<VBox> lh, double target, List<Integer> histo, int nColors, int niters) {
 		VBox vbox;
 		while (niters < MAX_ITERATIONS) {
 			vbox = lh.get(lh.size() - 1);
