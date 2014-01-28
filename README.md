@@ -1,5 +1,5 @@
 #Java Color Thief
-A port to Java of Lokesh Dhakar "Color Thief" for it to be executed server side on a JEE container or in a J2SE app.
+A port to Java of Lokesh Dhakar "Color Thief" for it to be executed server side on a JEE container or in a J2SE app. See http://lokeshdhakar.com/projects/color-thief/ for more informations and usage example of the javascript version.
 
 ##How to use
 See test case included in MMCQTest. Basically :
