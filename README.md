@@ -18,7 +18,7 @@ This project use Apache Maven.
 ##Credits and license
 
 ###Author
-Simon Oualid (simon.oualid@gmail.com)
+Simon Oualid (simon@oualid.net), originally for the wipplay.com website (http://www.wipplay.com)
 
 ###Thanks
 * Lokesh Dhakar - for the original Color Thief javascript version, available at http://lokeshdhakar.com/projects/color-thief/
