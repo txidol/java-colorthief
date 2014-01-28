@@ -21,5 +21,5 @@ This project use Apache Maven.
 Simon Oualid (simon.oualid@gmail.com)
 
 ###Thanks
-* Lokesh Dhakar
-* Nick Rabinowitz - For creating quantize.js.
+* Lokesh Dhakar - for the original Color Thief javascript version, available at http://lokeshdhakar.com/projects/color-thief/
+* Nick Rabinowitz - for creating quantize.js (ported here in Java)
