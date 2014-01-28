@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 public class MMCQTest extends TestCase {
 
 	public void testMMCQ() throws IOException {
-		BufferedImage img = ImageIO.read(MMCQTest.class.getResourceAsStream("/photo3.jpg"));
+		BufferedImage img = ImageIO.read(MMCQTest.class.getResourceAsStream("/photo.jpg"));
 		List<int[]> result = MMCQ.compute(img, 10);
 		for (int i=0; i<result.size(); i++) {
 			int[] is = result.get(i);
