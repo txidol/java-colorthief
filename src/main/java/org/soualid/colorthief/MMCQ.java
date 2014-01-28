@@ -447,7 +447,7 @@ public class MMCQ {
 	@SuppressWarnings("unchecked")
 	private static CMap quantize(List<int[]> pixels, int maxcolors) {
 		if (pixels.size() == 0 || maxcolors < 2 || maxcolors > 256) {
-			return null;
+			return null; 
 		}
 		List<Integer> histo = getHisto(pixels);
 		int nColors = 0;
