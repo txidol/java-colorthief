@@ -1,7 +1,7 @@
 #Java Color Thief
 A port to Java of Lokesh Dhakar "Color Thief" for it to be executed server side on a JEE container or in a J2SE app. See http://lokeshdhakar.com/projects/color-thief/ for more informations and usage example of the javascript version.
 
-[Example](https://raw2.github.com/soualid/java-colorthief/master/src/test/resources/example.png "Example")
+![Example](https://raw2.github.com/soualid/java-colorthief/master/src/test/resources/example.png)
 
 ##How to use
 See test case included in ```org.soualid.colorthief.MMCQTest```. 
