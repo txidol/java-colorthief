@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Java-colorthief : Java port of Lokesh Dhakar Color Thief (grab color palette from an image)" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Java-colorthief</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/soualid/java-colorthief">View on GitHub</a>
+
+          <h1 id="project_title">Java-colorthief</h1>
+          <h2 id="project_tagline">Java port of Lokesh Dhakar Color Thief (grab color palette from an image)</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/soualid/java-colorthief/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/soualid/java-colorthief/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="java-color-thief" class="anchor" href="#java-color-thief"><span class="octicon octicon-link"></span></a>Java Color Thief</h1>
+
+<p>A port to Java of Lokesh Dhakar "Color Thief" for it to be executed server side on a JEE container or in a J2SE app. See <a href="http://lokeshdhakar.com/projects/color-thief/">http://lokeshdhakar.com/projects/color-thief/</a> for more informations and usage example of the javascript version.</p>
+
+<p><img src="https://raw2.github.com/soualid/java-colorthief/master/src/test/resources/example.png" alt="Example"></p>
+
+<h2>
+<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h2>
+
+<p>See test case included in <code>org.soualid.colorthief.MMCQTest</code>. </p>
+
+<p>Basically :</p>
+
+<div class="highlight highlight-java"><pre>    <span class="n">BufferedImage</span> <span class="n">img</span> <span class="o">=</span> <span class="cm">/* read your image here using Image IO */</span><span class="o">;</span>
+    <span class="c1">// Then get the 10 most used colors palette (first being the dominant color of the image)</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">[]&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">MMCQ</span><span class="o">.</span><span class="na">compute</span><span class="o">(</span><span class="n">img</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span> 
+</pre></div>
+
+<h2>
+<a name="how-to-build" class="anchor" href="#how-to-build"><span class="octicon octicon-link"></span></a>How to build</h2>
+
+<p>This project use Apache Maven.</p>
+
+<h2>
+<a name="credits-and-license" class="anchor" href="#credits-and-license"><span class="octicon octicon-link"></span></a>Credits and license</h2>
+
+<h3>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author</h3>
+
+<p>Simon Oualid (<a href="mailto:simon@oualid.net">simon@oualid.net</a>), originally for the wipplay.com website (<a href="http://www.wipplay.com">http://www.wipplay.com</a>)</p>
+
+<h3>
+<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h3>
+
+<ul>
+<li>Lokesh Dhakar - for the original Color Thief javascript version, available at <a href="http://lokeshdhakar.com/projects/color-thief/">http://lokeshdhakar.com/projects/color-thief/</a>
+</li>
+<li>Nick Rabinowitz - for creating quantize.js (ported here in Java)</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Java-colorthief maintained by <a href="https://github.com/soualid">soualid</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
