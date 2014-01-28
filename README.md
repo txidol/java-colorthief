@@ -25,3 +25,9 @@ Simon Oualid (simon@oualid.net), originally for the wipplay.com website (http://
 ###Thanks
 * Lokesh Dhakar - for the original Color Thief javascript version, available at http://lokeshdhakar.com/projects/color-thief/
 * Nick Rabinowitz - for creating quantize.js (ported here in Java)
+
+###License
+Licensed under the [Creative Commons Attribution 2.5 License](http://creativecommons.org/licenses/by/2.5/)
+
+* Free for use in both personal and commercial projects.
+* Attribution requires leaving author name, author homepage link, and the license info intact.
