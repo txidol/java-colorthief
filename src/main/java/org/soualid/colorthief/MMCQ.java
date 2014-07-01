@@ -15,6 +15,12 @@ public class MMCQ {
 	private static final int MAX_ITERATIONS = 1000;
 	private static final double FRACT_BY_POPULATION = 0.75;
 	
+	public static CMap computeMap(BufferedImage image, int maxcolors) throws IOException {
+		List<int[]> pixels = getPixels(image);
+		CMap map = quantize(pixels, maxcolors);
+		return map;
+	}
+	
 	public static List<int[]> compute(BufferedImage image, int maxcolors) throws IOException {
 		List<int[]> pixels = getPixels(image);
 		return compute(pixels, maxcolors);
@@ -231,6 +237,8 @@ public class MMCQ {
 		public void push(VBox box) {
 			vboxes.add(new DenormalizedVBox(box, box.avg(false)));
 		}
+		
+		public List<DenormalizedVBox> getBoxes() { return vboxes; };
 
 		public List<int[]> palette() {
 			List<int[]> r = new ArrayList<int[]>();
@@ -450,25 +458,38 @@ public class MMCQ {
 			return null; 
 		}
 		List<Integer> histo = getHisto(pixels);
+		int numColors = 0;
+		for (int i = 0; i < histo.size(); i++) {
+			Integer val = histo.get(i);
+			if (val > 0) {
+				numColors++;
+			}
+		}
 		int nColors = 0;
 		VBox vbox = vboxFromPixels(pixels, histo);
 		List<VBox> pq = new ArrayList<VBox>();
 		pq.add(vbox);
 		int niters = 0;
+		nColors = 1;
 		Object[] r = iter(pq, FRACT_BY_POPULATION * maxcolors, histo, nColors, niters);
 		pq = (List<VBox>) r[0];
 		nColors = (Integer) r[1];
 		niters = (Integer) r[2];
-		Collections.sort(pq, new Comparator<VBox>() {
-			@Override
-			public int compare(VBox o1, VBox o2) {
-				return new Double(o1.count(false) * o1.getVolume(false)).compareTo(new Double(o1.count(false) * o1.getVolume(false)));
-			}
-		});
+		
+		nColors = 1;
+		niters = 0;
 		r = iter(pq, maxcolors - pq.size(), histo, nColors, niters);
 		pq = (List<VBox>) r[0];
 		nColors = (Integer) r[1];
 		niters = (Integer) r[2];
+		
+		Collections.sort(pq, new Comparator<VBox>() {
+			@Override
+			public int compare(VBox o1, VBox o2) {
+				return new Double(o1.count(false) * o1.getVolume(false)).compareTo(new Double(o2.count(false) * o2.getVolume(false)));
+			}
+		});
+		
 		CMap cmap = new CMap();
 		for (Iterator<VBox> iterator = pq.iterator(); iterator.hasNext();) {
 			VBox vBox2 = iterator.next();
@@ -484,11 +505,17 @@ public class MMCQ {
 			lh.remove(lh.size() - 1);
 			if (vbox.count(false) == 0) {
 				lh.add(vbox);
+				Collections.sort(lh, new Comparator<VBox>() {
+					@Override
+					public int compare(VBox o1, VBox o2) {
+						return new Double(o1.count(false) * o1.getVolume(false)).compareTo(new Double(o2.count(false) * o2.getVolume(false)));
+					}
+				});
 				niters++;
 				continue;
 			}
 			VBox[] vboxes = medianCutApply(histo, vbox);
-
+			//if (vboxes == null) return new Object[] { lh, nColors, niters };
 			VBox vbox1 = vboxes[0];
 			VBox vbox2 = vboxes[1];
 
