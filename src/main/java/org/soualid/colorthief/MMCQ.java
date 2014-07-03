@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class MMCQ {
 
@@ -68,11 +70,20 @@ public class MMCQ {
 
 		@Override
 		public String toString() {
+			/*
+
+			return "r1: " + (r1 >> RSHIFT) 
+					+ " / r2: " + (r2  >> RSHIFT) 
+					+ " / g1: " + (g1  >> RSHIFT) 
+					+ " / g2: " + (g2  >> RSHIFT) 
+					+ " / b1: " + (b1  >> RSHIFT) 
+					+ " / b2: " + (b2  >> RSHIFT) + "\n";
+			 */
 			return "r1: " + r1 + " / r2: " + r2 + " / g1: " + g1 + " / g2: " + g2 + " / b1: " + b1 + " / b2: " + b2 + "\n";
 		}
 
 		// r1: 0 / r2: 18 / g1: 0 / g2: 31 / b1: 0 / b2: 31
-		public VBox(int r1, int r2, int g1, int g2, int b1, int b2, List<Integer> histo) {
+		public VBox(int r1, int r2, int g1, int g2, int b1, int b2, Map<Integer,Integer> histo) {
 			super();
 			this.r1 = r1;
 			this.r2 = r2;
@@ -86,7 +97,7 @@ public class MMCQ {
 		private int[] _avg;
 		private Integer _volume;
 		private Integer _count;
-		private List<Integer> histo = new ArrayList<Integer>();
+		private Map<Integer,Integer> histo = new HashMap<Integer,Integer>();
 
 		public int getVolume(boolean recompute) {
 			if (_volume == null || recompute) {
@@ -96,7 +107,7 @@ public class MMCQ {
 		}
 
 		public VBox clone() {
-			VBox clone = new VBox(r1, r2, g1, g2, b1, b2, histo);
+			VBox clone = new VBox(r1, r2, g1, g2, b1, b2, new HashMap<Integer,Integer>(histo));
 			return clone;
 		}
 
@@ -180,11 +191,11 @@ public class MMCQ {
 			this.g2 = g2;
 		}
 
-		public List<Integer> getHisto() {
+		public Map<Integer,Integer> getHisto() {
 			return histo;
 		}
 
-		public void setHisto(List<Integer> histo) {
+		public void setHisto(Map<Integer,Integer> histo) {
 			this.histo = histo;
 		}
 
@@ -247,7 +258,7 @@ public class MMCQ {
 				DenormalizedVBox denormalizedVBox = (DenormalizedVBox) it.next();
 				r.add(denormalizedVBox.getColor());
 			}
-			Collections.reverse(r);
+			//Collections.reverse(r);
 			return r;
 		}
 
@@ -281,12 +292,9 @@ public class MMCQ {
 		}
 	}
 
-	private static List<Integer> getHisto(List<int[]> pixels) {
-		int histosize = 1 << (3 * SIGBITS);
-		List<Integer> histo = new ArrayList<Integer>(histosize);
-		for (int i = 0; i < histosize; i++) {
-			histo.add(0);
-		}
+	private static Map<Integer,Integer> getHisto(List<int[]> pixels) {
+		//int histosize = 1 << (3 * SIGBITS);
+		Map<Integer,Integer> histo = new HashMap<Integer,Integer>();
 		int index, rval, gval, bval;
 		Iterator<int[]> it = pixels.iterator();
 		while (it.hasNext()) {
@@ -296,12 +304,12 @@ public class MMCQ {
 			bval = pixel[2] >> RSHIFT;
 			index = getColorIndex(rval, gval, bval);
 			Integer cur = histo.get(index);
-			histo.set(index, (cur == null ? 0 : cur) + 1);
+			histo.put(index, (cur == null ? 0 : cur) + 1);
 		}
 		return histo;
 	}
 
-	private static VBox vboxFromPixels(List<int[]> pixels, List<Integer> histo) {
+	private static VBox vboxFromPixels(List<int[]> pixels, Map<Integer,Integer> histo) {
 		int rmin = 1000000, rmax = 0, gmin = 1000000, gmax = 0, bmin = 1000000, bmax = 0, rval, gval, bval;
 		Iterator<int[]> it = pixels.iterator();
 		while (it.hasNext()) {
@@ -309,6 +317,11 @@ public class MMCQ {
 			rval = pixel[0] >> RSHIFT;
 			gval = pixel[1] >> RSHIFT;
 			bval = pixel[2] >> RSHIFT;
+			/*
+			rval = pixel[0];
+			gval = pixel[1];
+			bval = pixel[2];
+			 */
 			if (rval < rmin)
 				rmin = rval;
 			else if (rval > rmax)
@@ -326,7 +339,7 @@ public class MMCQ {
 		return vbox;
 	}
 
-	private static VBox[] medianCutApply(List<Integer> histo, VBox vbox) {
+	private static VBox[] medianCutApply(Map<Integer,Integer> histo, VBox vbox) {
 		if (vbox.count(false) == 0)
 			return null;
 		if (vbox.count(false) == 1) {
@@ -335,8 +348,8 @@ public class MMCQ {
 		int rw = vbox.r2 - vbox.r1 + 1, gw = vbox.g2 - vbox.g1 + 1, bw = vbox.b2 - vbox.b1 + 1, maxw = Math.max(Math.max(rw, gw), bw);
 
 		int total = 0, i, j, k, sum, index;
-		List<Integer> partialsum = new ArrayList<Integer>();
-		List<Integer> lookaheadsum = new ArrayList<Integer>();
+		Map<Integer,Integer> partialsum = new HashMap<Integer,Integer>();
+		Map<Integer,Integer> lookaheadsum = new HashMap<Integer,Integer>();
 		if (maxw == rw) {
 			for (i = vbox.r1; i <= vbox.r2; i++) {
 				sum = 0;
@@ -348,13 +361,7 @@ public class MMCQ {
 					}
 				}
 				total += sum;
-				if (partialsum.size() < i) {
-					int toAdd = i - partialsum.size();
-					for (int l = partialsum.size(); l < toAdd; l++) {
-						partialsum.add(0);
-					}
-				}
-				partialsum.add(i, total);
+				partialsum.put(i, total);
 			}
 		} else if (maxw == gw) {
 			for (i = vbox.g1; i <= vbox.g2; i++) {
@@ -367,13 +374,7 @@ public class MMCQ {
 					}
 				}
 				total += sum;
-				if (partialsum.size() < i) {
-					int toAdd = i - partialsum.size();
-					for (int l = partialsum.size(); l < toAdd; l++) {
-						partialsum.add(0);
-					}
-				}
-				partialsum.add(i, total);
+				partialsum.put(i, total);
 			}
 		} else {
 			for (i = vbox.b1; i <= vbox.b2; i++) {
@@ -386,26 +387,19 @@ public class MMCQ {
 					}
 				}
 				total += sum;
-				if (partialsum.size() < i) {
-					int toAdd = i - partialsum.size();
-					for (int l = partialsum.size(); l < toAdd; l++) {
-						partialsum.add(0);
-					}
-				}
-				partialsum.add(i, total);
+				partialsum.put(i, total);
 			}
 		}
-		Iterator<Integer> it = partialsum.iterator();
-		i = 0;
+		
+		Iterator<Integer> it = partialsum.keySet().iterator();
 		while (it.hasNext()) {
-			Integer integer = (Integer) it.next();
-			lookaheadsum.add(i, total - integer);
-			i++;
+			Integer key = it.next();
+			lookaheadsum.put(key, total - key);
 		}
 		return maxw == rw ? doCut("r", vbox, partialsum, lookaheadsum, total) : maxw == gw ? doCut("g", vbox, partialsum, lookaheadsum, total) : doCut("b", vbox, partialsum, lookaheadsum, total);
 	}
 
-	private static VBox[] doCut(String color, VBox vbox, List<Integer> partialsum, List<Integer> lookaheadsum, int total) {
+	private static VBox[] doCut(String color, VBox vbox, Map<Integer,Integer> partialsum, Map<Integer,Integer> lookaheadsum, int total) {
 		int dim1 = 0, dim2 = 0;
 		if ("r".equals(color)) {
 			dim1 = vbox.getR1();
@@ -420,7 +414,7 @@ public class MMCQ {
 		VBox vbox1 = null, vbox2 = null;
 		int left, right, d2;
 		Integer count2;
-		for (int i = dim1; i < dim2; i++) {
+		for (int i = dim1; i <= dim2; i++) {
 			if (partialsum.get(i) > total / 2) {
 				vbox1 = vbox.clone();
 				vbox2 = vbox.clone();
@@ -434,7 +428,7 @@ public class MMCQ {
 				while (partialsum.get(d2) == null)
 					d2++;
 				count2 = lookaheadsum.get(d2);
-				while (count2 == null && partialsum.get(d2 - 1) == null)
+				while (count2 == null && partialsum.get(d2 - 1) != null)
 					count2 = lookaheadsum.get(--d2);
 				if ("r".equals(color)) {
 					vbox1.setR2(d2);
@@ -457,20 +451,16 @@ public class MMCQ {
 		if (pixels.size() == 0 || maxcolors < 2 || maxcolors > 256) {
 			return null; 
 		}
-		List<Integer> histo = getHisto(pixels);
-		int numColors = 0;
-		for (int i = 0; i < histo.size(); i++) {
-			Integer val = histo.get(i);
-			if (val > 0) {
-				numColors++;
-			}
-		}
+		Map<Integer,Integer> histo = getHisto(pixels);
 		int nColors = 0;
+		//histo.get(29628)
+		//System.out.println("histo size: " + histo.size());
 		VBox vbox = vboxFromPixels(pixels, histo);
 		List<VBox> pq = new ArrayList<VBox>();
 		pq.add(vbox);
 		int niters = 0;
 		nColors = 1;
+        //System.out.println("will start with target: " + FRACT_BY_POPULATION + " * " + maxcolors);
 		Object[] r = iter(pq, FRACT_BY_POPULATION * maxcolors, histo, nColors, niters);
 		pq = (List<VBox>) r[0];
 		nColors = (Integer) r[1];
@@ -486,7 +476,8 @@ public class MMCQ {
 		Collections.sort(pq, new Comparator<VBox>() {
 			@Override
 			public int compare(VBox o1, VBox o2) {
-				return new Double(o1.count(false) * o1.getVolume(false)).compareTo(new Double(o2.count(false) * o2.getVolume(false)));
+				//return new Double(o1.count(true) * o1.getVolume(true)).compareTo(new Double(o2.count(true) * o2.getVolume(true)));
+				return new Double(o2.count(true)).compareTo(new Double(o1.count(true) ));
 			}
 		});
 		
@@ -498,11 +489,13 @@ public class MMCQ {
 		return cmap;
 	}
 
-	private static Object[] iter(List<VBox> lh, double target, List<Integer> histo, int nColors, int niters) {
+	private static Object[] iter(List<VBox> lh, double target, Map<Integer,Integer> histo, int nColors, int niters) {
 		VBox vbox;
 		while (niters < MAX_ITERATIONS) {
 			vbox = lh.get(lh.size() - 1);
 			lh.remove(lh.size() - 1);
+			//System.out.println("iter: " + niters + " still " + lh.size());
+			//System.out.println(vbox);
 			if (vbox.count(false) == 0) {
 				lh.add(vbox);
 				Collections.sort(lh, new Comparator<VBox>() {
@@ -515,10 +508,11 @@ public class MMCQ {
 				continue;
 			}
 			VBox[] vboxes = medianCutApply(histo, vbox);
-			//if (vboxes == null) return new Object[] { lh, nColors, niters };
 			VBox vbox1 = vboxes[0];
-			VBox vbox2 = vboxes[1];
+			VBox vbox2 = vboxes.length > 1 ? vboxes[1] : null;
 
+			//System.out.println(vbox1);
+			//System.out.println(vbox2);
 			if (vbox1 == null)
 				return new Object[] { lh, nColors, niters };
 			lh.add(vbox1);
@@ -526,6 +520,8 @@ public class MMCQ {
 				lh.add(vbox2);
 				nColors++;
 			}
+
+            //System.out.println("ncolors: " + nColors + " target: " + target);
 			if (nColors >= target)
 				return new Object[] { lh, nColors, niters };
 			if (niters++ > MAX_ITERATIONS) {
