@@ -60,7 +60,7 @@ public class MMCQ {
 		return (r << (2 * SIGBITS)) + (g << SIGBITS) + b;
 	}
 
-	static class VBox {
+	public static class VBox {
 		private int r1;
 		private int r2;
 		private int g1;
@@ -216,7 +216,7 @@ public class MMCQ {
 		}
 	}
 
-	static class DenormalizedVBox {
+	public static class DenormalizedVBox {
 		private VBox vbox;
 		private int[] color;
 
@@ -242,7 +242,7 @@ public class MMCQ {
 		}
 	}
 
-	static class CMap {
+	public static class CMap {
 		private ArrayList<DenormalizedVBox> vboxes = new ArrayList<DenormalizedVBox>();
 
 		public void push(VBox box) {
@@ -484,7 +484,8 @@ public class MMCQ {
 		CMap cmap = new CMap();
 		for (Iterator<VBox> iterator = pq.iterator(); iterator.hasNext();) {
 			VBox vBox2 = iterator.next();
-			cmap.push(vBox2);
+			if (vBox2.count(false) > 0)
+				cmap.push(vBox2);
 		}
 		return cmap;
 	}
